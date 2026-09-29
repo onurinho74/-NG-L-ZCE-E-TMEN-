@@ -10,7 +10,7 @@ import {
   UserPlus,
   Share2,
 } from 'lucide-react';
-import { getAllAccounts } from '../services/accountService';
+import { getAllAccounts, getActiveSession } from '../services/accountService';
 import { UserProgress } from '../types';
 
 interface LeaderboardModalProps {
@@ -39,6 +39,33 @@ export const LeaderboardModal: React.FC<LeaderboardModalProps> = ({
   onOpenShare,
 }) => {
   if (!isOpen) return null;
+
+  const activeSession = getActiveSession();
+
+  if (!activeSession) {
+    return (
+      <div className="fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-xs flex items-center justify-center p-4 overflow-y-auto">
+        <div className="bg-white rounded-3xl max-w-md w-full shadow-2xl border border-slate-200 overflow-hidden p-6 text-center animate-in fade-in zoom-in-95 duration-200">
+          <div className="w-16 h-16 bg-indigo-50 text-indigo-600 rounded-2xl flex items-center justify-center mx-auto mb-4 border border-indigo-100">
+            <Trophy className="w-8 h-8 text-amber-500" />
+          </div>
+          <h3 className="text-xl font-bold font-display text-slate-900 mb-2">
+            Liderlik Tablosu (Oturum Gerekli)
+          </h3>
+          <p className="text-sm text-slate-600 mb-6 leading-relaxed">
+            Liderlik tablosunu görebilmek ve sıralamada yer alabilmek için lütfen oturum açın. Oturum kapalıyken puanınız gizlidir.
+          </p>
+          <button
+            type="button"
+            onClick={onClose}
+            className="w-full py-3 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white font-semibold text-xs transition-colors shadow-sm"
+          >
+            Tamam
+          </button>
+        </div>
+      </div>
+    );
+  }
 
   // Gather ONLY genuine registered accounts
   const accounts = getAllAccounts();
