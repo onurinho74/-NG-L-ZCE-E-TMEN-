@@ -1,0 +1,16 @@
+{
+  "name": "EnglishMaster AI - İngilizce Öğrenme Asistanı",
+  "short_name": "EnglishMaster",
+  "description": "4 haftalık yapılandırılmış İngilizce müfredatı ve yapay zeka destekli konuşma koçu.",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#f8fafc",
+  "theme_color": "#4f46e5",
+  "icons": [
+    {
+      "src": "/favicon.ico",
+      "sizes": "64x64 32x32 24x24 16x16",
+      "type": "image/x-icon"
+    }
+  ]
+}
