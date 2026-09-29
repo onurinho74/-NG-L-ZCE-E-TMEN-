@@ -66,6 +66,7 @@ export interface MessageTurn {
   id: string;
   sender: 'user' | 'teacher';
   text: string;
+  textTr?: string;
   timestamp: number;
   evaluation?: TeacherEvaluationResult;
   challengeId?: string;

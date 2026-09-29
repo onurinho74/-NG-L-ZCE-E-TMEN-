@@ -81,6 +81,7 @@ export const ClassroomView: React.FC<ClassroomViewProps> = ({
       id: `init_${lesson.day}_${Date.now()}`,
       sender: 'teacher',
       text: lesson.initialPrompt,
+      textTr: lesson.initialPromptTr,
       timestamp: Date.now(),
       challengeId: lesson.challenges[0]?.id,
     };
@@ -220,6 +221,7 @@ export const ClassroomView: React.FC<ClassroomViewProps> = ({
         id: `teacher_${Date.now()}`,
         sender: 'teacher',
         text: evaluation.next_prompt || evaluation.feedback_message,
+        textTr: evaluation.feedback_message || currentChallenge?.instructionTr,
         timestamp: Date.now(),
         evaluation,
         challengeId: currentChallenge?.id,
@@ -295,6 +297,7 @@ export const ClassroomView: React.FC<ClassroomViewProps> = ({
         id: `challenge_prompt_${Date.now()}`,
         sender: 'teacher',
         text: nextChallenge.promptEn,
+        textTr: nextChallenge.instructionTr,
         timestamp: Date.now(),
         challengeId: nextChallenge.id,
       };
@@ -810,9 +813,14 @@ export const ClassroomView: React.FC<ClassroomViewProps> = ({
                     >
                       <div className="flex items-start justify-between gap-3">
                         <div className="space-y-1">
-                          <p className="whitespace-pre-wrap">{turn.text}</p>
+                          <p className="whitespace-pre-wrap font-medium">{turn.text}</p>
+                          {isTeacher && turn.textTr && (
+                            <div className="text-[11px] text-indigo-950 font-medium pt-1.5 mt-1 border-t border-indigo-100 bg-indigo-50/70 p-2 rounded-lg">
+                              🇹🇷 <span className="font-bold">Türkçe Anlamı:</span> {turn.textTr}
+                            </div>
+                          )}
                           {isTeacher && (
-                            <p className="text-[11px] text-indigo-700 font-medium pt-1 border-t border-slate-200/80">
+                            <p className="text-[11px] text-slate-600 font-medium pt-1">
                               🗣️ Okunuşu: <span className="font-mono italic font-semibold">"{getTurkishPronunciation(turn.text)}"</span>
                             </p>
                           )}
@@ -949,6 +957,7 @@ export const ClassroomView: React.FC<ClassroomViewProps> = ({
                       id: `reset_${Date.now()}`,
                       sender: 'teacher',
                       text: currentChallenge?.promptEn || lesson.initialPrompt,
+                      textTr: currentChallenge?.instructionTr || lesson.initialPromptTr,
                       timestamp: Date.now(),
                     };
                     setMessages([initialTurn]);
