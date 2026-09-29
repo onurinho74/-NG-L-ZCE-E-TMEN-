@@ -229,6 +229,15 @@ export function loginOrRegisterWithGoogle(params: GoogleAuthParams): StoredAccou
     if (!existing.displayName || existing.displayName === 'Öğrenci') {
       existing.displayName = cleanDisplayName;
     }
+    // Merge with local progress if local progress has more score
+    const localProg = loadUserProgress();
+    if (localProg && (localProg.totalScore > (existing.progress?.totalScore || 0) || (localProg.completedDays?.length || 0) > (existing.progress?.completedDays?.length || 0))) {
+      existing.progress = {
+        ...localProg,
+        userName: existing.displayName,
+        userEmail: existing.email,
+      };
+    }
     saveAllAccounts(accounts);
     setActiveSession(existing);
     return existing;
@@ -292,6 +301,17 @@ export function loginAccount(params: LoginParams): StoredAccount {
 
   if (matched.passwordHash !== hashedInput) {
     throw new Error('Girdiğiniz şifre hatalı. Lütfen tekrar deneyiniz.');
+  }
+
+  // Merge with local progress if local progress has more score
+  const localProg = loadUserProgress();
+  if (localProg && (localProg.totalScore > (matched.progress?.totalScore || 0) || (localProg.completedDays?.length || 0) > (matched.progress?.completedDays?.length || 0))) {
+    matched.progress = {
+      ...localProg,
+      userName: matched.displayName,
+      userEmail: matched.email,
+      userPhone: matched.phoneNumber,
+    };
   }
 
   // Update last login

@@ -32,10 +32,14 @@ export default function App() {
 
   const [progress, setProgress] = useState<UserProgress>(() => {
     const active = getActiveSession();
+    const local = loadUserProgress();
     if (active && active.progress) {
+      if (local && (local.totalScore > (active.progress.totalScore || 0) || (local.completedDays?.length || 0) > (active.progress.completedDays?.length || 0))) {
+        return local;
+      }
       return active.progress;
     }
-    return loadUserProgress();
+    return local;
   });
 
   const [activeTab, setActiveTab] = useState<'classroom' | 'curriculum' | 'vocabulary' | 'progress' | 'freechat'>('classroom');
