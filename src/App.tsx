@@ -6,6 +6,7 @@ import {
   getActiveSession,
   logoutAccount,
   updateUserAccountProgress,
+  updateUserDisplayName,
   StoredAccount,
 } from './services/accountService';
 import { Navbar } from './components/Navbar';
@@ -153,6 +154,20 @@ export default function App() {
         onSignOut={handleSignOut}
         onOpenShare={() => setIsShareModalOpen(true)}
         onOpenLeaderboard={() => setIsLeaderboardModalOpen(true)}
+        onUpdateDisplayName={(newName) => {
+          if (currentUser && 'uid' in currentUser) {
+            const updated = updateUserDisplayName(currentUser.uid, newName);
+            if (updated) {
+              setCurrentUser(updated as any);
+              setProgress({
+                ...progress,
+                userName: newName,
+              });
+            }
+          } else if (currentUser) {
+            setCurrentUser(Object.assign({}, currentUser, { displayName: newName }) as any);
+          }
+        }}
       />
 
       {/* Main Content Area */}

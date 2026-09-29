@@ -7,6 +7,8 @@ import {
   Trophy,
   Share2,
   Check,
+  Edit3,
+  X,
   User as UserIcon,
 } from 'lucide-react';
 
@@ -23,6 +25,7 @@ interface NavbarProps {
   onSignOut: () => void;
   onOpenShare?: () => void;
   onOpenLeaderboard?: () => void;
+  onUpdateDisplayName?: (newName: string) => void;
 }
 
 export const Navbar: React.FC<NavbarProps> = ({
@@ -37,11 +40,14 @@ export const Navbar: React.FC<NavbarProps> = ({
   onSignOut,
   onOpenShare,
   onOpenLeaderboard,
+  onUpdateDisplayName,
 }) => {
   const [showUserDropdown, setShowUserDropdown] = useState(false);
+  const [isEditingName, setIsEditingName] = useState(false);
+  const userDisplayName = currentUser?.displayName || currentUser?.email?.split('@')[0] || 'Öğrenci';
+  const [newNameInput, setNewNameInput] = useState(userDisplayName);
 
   const initialLetter = (academyName || 'E').charAt(0).toUpperCase();
-  const userDisplayName = currentUser?.displayName || currentUser?.email?.split('@')[0] || 'Öğrenci';
   const userInitial = userDisplayName.charAt(0).toUpperCase();
 
   return (
@@ -198,6 +204,17 @@ export const Navbar: React.FC<NavbarProps> = ({
                     <button
                       onClick={() => {
                         setShowUserDropdown(false);
+                        setNewNameInput(userDisplayName);
+                        setIsEditingName(true);
+                      }}
+                      className="w-full text-left px-3 py-2 text-xs text-slate-700 hover:bg-slate-50 rounded-lg font-medium flex items-center gap-2"
+                    >
+                      <Edit3 className="w-3.5 h-3.5 text-indigo-600" />
+                      <span>İsim ve Soyismi Güncelle</span>
+                    </button>
+                    <button
+                      onClick={() => {
+                        setShowUserDropdown(false);
                         onSignOut();
                       }}
                       className="w-full text-left px-3 py-2 text-xs text-rose-600 hover:bg-rose-50 rounded-lg font-medium flex items-center gap-2"
@@ -220,6 +237,54 @@ export const Navbar: React.FC<NavbarProps> = ({
           )}
         </div>
       </div>
+
+      {/* Edit Name Modal */}
+      {isEditingName && (
+        <div className="fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-xs flex items-center justify-center p-4">
+          <div className="bg-white rounded-3xl max-w-sm w-full p-6 shadow-2xl border border-slate-200 animate-in fade-in zoom-in-95 duration-150">
+            <div className="flex items-center justify-between mb-4">
+              <h3 className="text-lg font-bold text-slate-900 font-display">Ad ve Soyadı Güncelle</h3>
+              <button
+                onClick={() => setIsEditingName(false)}
+                className="p-1.5 rounded-full text-slate-400 hover:text-slate-700 hover:bg-slate-100 transition-colors"
+              >
+                <X className="w-4 h-4" />
+              </button>
+            </div>
+            <p className="text-xs text-slate-600 mb-4">
+              Sıralamada ve karnenizde görünecek adınızı ve soyadınızı aşağıya yazın:
+            </p>
+            <input
+              type="text"
+              value={newNameInput}
+              onChange={(e) => setNewNameInput(e.target.value)}
+              placeholder="Adınız Soyadınız"
+              className="w-full px-4 py-2.5 rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-indigo-600 text-sm font-medium mb-5"
+            />
+            <div className="flex items-center justify-end gap-2">
+              <button
+                type="button"
+                onClick={() => setIsEditingName(false)}
+                className="px-4 py-2 rounded-xl text-slate-600 hover:bg-slate-100 text-xs font-bold transition-colors"
+              >
+                İptal
+              </button>
+              <button
+                type="button"
+                onClick={() => {
+                  if (newNameInput.trim() && onUpdateDisplayName) {
+                    onUpdateDisplayName(newNameInput.trim());
+                  }
+                  setIsEditingName(false);
+                }}
+                className="px-4 py-2 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-bold transition-all shadow-xs"
+              >
+                Kaydet
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* Mobile Sub-Navigation Bar */}
       <div className="md:hidden border-t border-slate-100 px-4 py-2 flex items-center justify-between gap-1 overflow-x-auto bg-slate-50">

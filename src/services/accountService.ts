@@ -1,5 +1,7 @@
 import { UserAccount, UserProgress } from '../types';
 import { loadUserProgress } from '../utils/storage';
+import { db } from './firebase';
+import { collection, doc, setDoc, getDocs } from 'firebase/firestore';
 
 export interface StoredAccount {
   uid: string;
@@ -25,12 +27,72 @@ function simpleHash(str: string): string {
   }
 }
 
-// Get all stored accounts
+// Background sync with Firestore
+async function syncAccountToFirestore(account: StoredAccount): Promise<void> {
+  try {
+    if (!db) return;
+    const userRef = doc(db, 'users', account.uid);
+    await setDoc(userRef, {
+      uid: account.uid,
+      displayName: account.displayName,
+      username: account.username,
+      email: account.email || '',
+      score: account.progress?.totalScore ?? 0,
+      streak: account.progress?.streakDays ?? 1,
+      completedDaysCount: account.progress?.completedDays?.length ?? 0,
+      progress: account.progress,
+      lastLoginAt: account.lastLoginAt,
+      updatedAt: new Date().toISOString()
+    }, { merge: true });
+  } catch (err) {
+    console.error('Firestore sync error:', err);
+  }
+}
+
+// Get all stored accounts (merged with Firestore if available)
 export function getAllAccounts(): StoredAccount[] {
   if (typeof window === 'undefined') return [];
   try {
     const raw = localStorage.getItem(STORAGE_KEY);
-    return raw ? JSON.parse(raw) : [];
+    const localAccounts: StoredAccount[] = raw ? JSON.parse(raw) : [];
+
+    // Also fetch from Firestore async in background
+    if (db) {
+      getDocs(collection(db, 'users')).then((snapshot) => {
+        const firestoreAccounts: StoredAccount[] = [];
+        snapshot.forEach((docSnap) => {
+          const data = docSnap.data();
+          firestoreAccounts.push({
+            uid: data.uid,
+            displayName: data.displayName,
+            username: data.username,
+            email: data.email,
+            phoneNumber: data.phoneNumber,
+            passwordHash: data.passwordHash || 'cloud_synced',
+            createdAt: data.createdAt || new Date().toISOString(),
+            lastLoginAt: data.lastLoginAt || new Date().toISOString(),
+            progress: data.progress || { totalScore: data.score || 0, streakDays: data.streak || 1, completedDays: [] }
+          });
+        });
+
+        if (firestoreAccounts.length > 0) {
+          // Merge with local
+          const map = new Map<string, StoredAccount>();
+          localAccounts.forEach(a => map.set(a.uid, a));
+          firestoreAccounts.forEach(fa => {
+            if (!map.has(fa.uid) || (fa.progress?.totalScore ?? 0) >= (map.get(fa.uid)?.progress?.totalScore ?? 0)) {
+              map.set(fa.uid, fa);
+            }
+          });
+          const merged = Array.from(map.values());
+          localStorage.setItem(STORAGE_KEY, JSON.stringify(merged));
+        }
+      }).catch(err => {
+        console.error('Failed to fetch users from Firestore:', err);
+      });
+    }
+
+    return localAccounts;
   } catch (e) {
     console.error('Error loading accounts:', e);
     return [];
@@ -42,6 +104,8 @@ function saveAllAccounts(accounts: StoredAccount[]): void {
   if (typeof window === 'undefined') return;
   try {
     localStorage.setItem(STORAGE_KEY, JSON.stringify(accounts));
+    // Sync each to Firestore
+    accounts.forEach(acc => syncAccountToFirestore(acc));
   } catch (e) {
     console.error('Error saving accounts:', e);
   }
@@ -261,4 +325,22 @@ export function updateUserAccountProgress(uid: string, updatedProgress: UserProg
  */
 export function logoutAccount(): void {
   setActiveSession(null);
+}
+
+/**
+ * Update user display name (First and Last name)
+ */
+export function updateUserDisplayName(uid: string, newDisplayName: string): StoredAccount | null {
+  const accounts = getAllAccounts();
+  const index = accounts.findIndex((a) => a.uid === uid);
+  if (index !== -1) {
+    accounts[index].displayName = newDisplayName.trim();
+    if (accounts[index].progress) {
+      accounts[index].progress.userName = newDisplayName.trim();
+    }
+    saveAllAccounts(accounts);
+    setActiveSession(accounts[index]);
+    return accounts[index];
+  }
+  return null;
 }
