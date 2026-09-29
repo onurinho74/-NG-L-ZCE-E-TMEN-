@@ -1,0 +1,41 @@
+{
+  "entities": {
+    "User": {
+      "title": "User",
+      "description": "Kullanıcı profil ve hesap bilgileri",
+      "type": "object",
+      "properties": {
+        "uid": { "type": "string" },
+        "email": { "type": "string" },
+        "displayName": { "type": "string" },
+        "phoneNumber": { "type": "string" },
+        "createdAt": { "type": "string" }
+      },
+      "required": ["uid", "createdAt"]
+    },
+    "UserProgress": {
+      "title": "UserProgress",
+      "description": "Kullanıcıya özel 28 günlük müfredat ilerlemesi, puanlar ve kelime defteri",
+      "type": "object",
+      "properties": {
+        "userId": { "type": "string" },
+        "currentDay": { "type": "integer" },
+        "totalScore": { "type": "integer" },
+        "streakDays": { "type": "integer" },
+        "lastActiveDate": { "type": "string" },
+        "academyName": { "type": "string" }
+      },
+      "required": ["userId", "currentDay", "totalScore", "streakDays"]
+    }
+  },
+  "firestore": {
+    "/users/{userId}": {
+      "schema": "User",
+      "description": "Kullanıcı özel hesap profili"
+    },
+    "/users/{userId}/progress/current": {
+      "schema": "UserProgress",
+      "description": "Kişiye özel 28 günlük ilerleme ve puan verisi"
+    }
+  }
+}

@@ -1,0 +1,6 @@
+{
+  "name": "LinguaAcademy AI - 4 Haftalık İnteraktif İngilizce Öğrenme",
+  "description": "4 haftalık yapılandırılmış İngilizce müfredatı, yapay zeka destekli gramer ve konuşma koçu, anlık Türkçe geri bildirim ve akıllı puanlama motoru.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
