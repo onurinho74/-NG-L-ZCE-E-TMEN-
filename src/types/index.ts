@@ -15,6 +15,26 @@ export interface InteractiveChallenge {
   hintTr?: string;
 }
 
+export interface LessonDialogueTurn {
+  speaker: string;
+  en: string;
+  tr: string;
+}
+
+export interface CommonMistake {
+  wrong: string;
+  correct: string;
+  explanation: string;
+}
+
+export interface LessonTeachingData {
+  summaryTr: string;
+  keyRuleTr: string;
+  dialogue: LessonDialogueTurn[];
+  commonMistakes: CommonMistake[];
+  proTipTr: string;
+}
+
 export interface DayLesson {
   day: number;
   week: number;
@@ -31,6 +51,7 @@ export interface DayLesson {
   initialPromptTr: string;
   challenges: InteractiveChallenge[];
   estimatedMinutes: number;
+  teaching?: LessonTeachingData;
 }
 
 export interface TeacherEvaluationResult {
@@ -38,6 +59,7 @@ export interface TeacherEvaluationResult {
   score_earned: number;
   feedback_message: string;
   next_prompt: string;
+  sample_better_sentence?: string;
 }
 
 export interface MessageTurn {

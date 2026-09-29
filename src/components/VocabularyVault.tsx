@@ -2,6 +2,7 @@ import React, { useState, useMemo } from 'react';
 import { CURRICULUM } from '../data/curriculum';
 import { TargetWord, UserProgress } from '../types';
 import { speakEnglish } from '../utils/speech';
+import { getTurkishPronunciation } from '../utils/pronunciation';
 import {
   Volume2,
   Bookmark,
@@ -175,8 +176,8 @@ export const VocabularyVault: React.FC<VocabularyVaultProps> = ({
                     <h2 className="text-4xl font-bold text-slate-900 font-display">
                       {currentFlashcard.word}
                     </h2>
-                    <p className="text-sm font-mono text-slate-400">
-                      {currentFlashcard.phonetic}
+                    <p className="text-xs text-amber-900 bg-amber-50 px-2.5 py-1 rounded-lg border border-amber-200/70 font-medium inline-block">
+                      🗣️ Okunuşu: <span className="font-bold">"{getTurkishPronunciation(currentFlashcard.word)}"</span>
                     </p>
                     <p className="text-xs text-slate-500 pt-3 italic max-w-sm mx-auto">
                       "{currentFlashcard.exampleEn}"
@@ -333,14 +334,14 @@ export const VocabularyVault: React.FC<VocabularyVaultProps> = ({
                       </button>
                     </div>
 
-                    {/* Word title and phonetic */}
+                    {/* Word title and phonetic & Turkish pronunciation */}
                     <div className="flex items-center justify-between">
                       <div>
                         <h3 className="text-base font-bold text-slate-900">
                           {item.word}
                         </h3>
-                        <p className="text-xs font-mono text-slate-400 mt-0.5">
-                          {item.phonetic}
+                        <p className="text-xs text-amber-900 bg-amber-50 px-2 py-0.5 rounded-md border border-amber-200/70 font-medium inline-block mt-1">
+                          🗣️ Okunuşu: <span className="font-bold">"{getTurkishPronunciation(item.word)}"</span>
                         </p>
                       </div>
 

@@ -32,15 +32,13 @@ async function startServer() {
   // Evaluator endpoint for LinguaAcademy AI
   app.post('/api/evaluate', async (req, res) => {
     try {
-      const {
-        user_message,
-        current_day = 1,
-        day_title = 'Kendini Tanıtma & Selamlaşma',
-        target_words = [],
-        expected_pattern = 'Hello, my name is...',
-        step_context = '',
-        conversation_history = [],
-      } = req.body;
+      const user_message = req.body.user_message || req.body.userMessage;
+      const current_day = req.body.current_day || req.body.dayNumber || 1;
+      const day_title = req.body.day_title || req.body.titleTr || 'Kendini Tanıtma & Selamlaşma';
+      const target_words = req.body.target_words || req.body.targetWords || [];
+      const expected_pattern = req.body.expected_pattern || req.body.expectedPattern || 'Hello, my name is...';
+      const step_context = req.body.step_context || req.body.challengeInstruction || '';
+      const conversation_history = req.body.conversation_history || req.body.conversationHistory || [];
 
       if (!user_message || typeof user_message !== 'string') {
         return res.status(400).json({
